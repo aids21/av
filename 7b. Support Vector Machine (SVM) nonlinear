@@ -1,0 +1,38 @@
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+data = pd.read_csv("california_housing(2).csv")
+
+X = data.drop("MedHouseVal", axis=1)
+y = (data["MedHouseVal"] > data["MedHouseVal"].median()).astype(int)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+linear = SVC(kernel="linear")
+rbf = SVC(kernel="rbf")
+
+linear.fit(X_train, y_train)
+rbf.fit(X_train, y_train)
+
+pred1 = linear.predict(X_test)
+pred2 = rbf.predict(X_test)
+
+print("Linear Kernel Accuracy:", accuracy_score(y_test, pred1))
+print("RBF Kernel Accuracy:", accuracy_score(y_test, pred2))
+
+print("Linear Kernel F1 Score:", f1_score(y_test, pred1))
+print("RBF Kernel F1 Score:", f1_score(y_test, pred2))
+
+print("Linear Kernel Precision:", precision_score(y_test, pred1))
+print("RBF Kernel Precision:", precision_score(y_test, pred2))
+
+print("Linear Kernel Recall:", recall_score(y_test, pred1))
+print("RBF Kernel Recall:", recall_score(y_test, pred2))
