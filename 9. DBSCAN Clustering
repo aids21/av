@@ -1,0 +1,23 @@
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
+
+data = pd.read_csv("make_moons(1).csv")
+
+X = data[["Feature_1", "Feature_2"]]
+
+X = StandardScaler().fit_transform(X)
+
+model = DBSCAN(eps=0.3, min_samples=5)
+data["Cluster"] = model.fit_predict(X)
+
+plt.scatter(X[:, 0], X[:, 1], c=data["Cluster"], cmap="rainbow")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.title("DBSCAN Clustering")
+plt.show()
+
+print(data.head())
+print("Noise Points:", sum(data["Cluster"] == -1))
