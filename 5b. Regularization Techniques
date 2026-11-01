@@ -1,0 +1,50 @@
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression, Lasso
+from sklearn.metrics import r2_score
+
+data = pd.read_csv("california_housing.csv")
+
+X = data.drop("MedHouseVal", axis=1)
+y = data["MedHouseVal"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+
+lasso = Lasso(alpha=0.01)
+lasso.fit(X_train, y_train)
+
+print("Linear Regression")
+print("Training R2:", r2_score(y_train, lr.predict(X_train)))
+print("Testing R2:", r2_score(y_test, lr.predict(X_test)))
+
+print("\nLasso Regression")
+print("Training R2:", r2_score(y_train, lasso.predict(X_train)))
+print("Testing R2:", r2_score(y_test, lasso.predict(X_test)))
+
+print("\nFeature Selection")
+for feature, coefficient in zip(X.columns, lasso.coef_):
+    print(feature, ":", coefficient)
+
+print("\nSelected Features:")
+print(X.columns[lasso.coef_ != 0].tolist())
+
+plt.bar(X.columns, abs(lasso.coef_))
+plt.title("Lasso Feature Selection")
+plt.xlabel("Features")
+plt.ylabel("Coefficient Value")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
